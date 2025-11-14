@@ -24,7 +24,12 @@ demo-cc-online/
 
 - `src/` - Main source code directory
 - `tests/` or `__tests__/` - Test files
-- `docs/` - Additional documentation
+- `docs/` - All documentation files (except README.md and CLAUDE.md)
+  - `docs/design/` - Design documents and specifications
+  - `docs/reports/` - Test reports, analysis reports
+  - `docs/api/` - API documentation
+  - `docs/guides/` - User guides and tutorials
+  - `docs/architecture/` - Architecture diagrams and documentation
 - `config/` - Configuration files
 - `scripts/` - Build and utility scripts
 - `public/` or `static/` - Static assets (if web project)
@@ -165,6 +170,45 @@ refactor(utils): simplify date formatting logic
 
 ## Documentation Standards
 
+### File Organization Rules
+
+**IMPORTANT**: All documentation files must be properly organized according to these rules:
+
+1. **Root-Level Documentation** (allowed in project root):
+   - `README.md` - Project overview, setup, and usage instructions
+   - `CLAUDE.md` - AI assistant guidelines and conventions
+   - `LICENSE` - Project license file
+   - `CHANGELOG.md` - Version history and changes (if used)
+
+2. **Documentation Directory** (`docs/`):
+   - ALL other markdown files must be placed in the `docs/` directory
+   - This includes but not limited to:
+     - Design documents
+     - Architecture documentation
+     - Test reports
+     - Analysis reports
+     - Technical specifications
+     - API documentation
+     - User guides
+     - Any other `.md` files
+
+3. **Subdirectory Organization within `docs/`**:
+   ```
+   docs/
+   ├── design/          # Design documents and specifications
+   ├── reports/         # Test reports, analysis reports
+   ├── api/             # API documentation
+   ├── guides/          # User guides and tutorials
+   └── architecture/    # Architecture diagrams and docs
+   ```
+
+**Examples**:
+- ✅ Correct: `docs/reports/test-report-2025-11-14.md`
+- ✅ Correct: `docs/design/database-schema.md`
+- ✅ Correct: `README.md` (root level exception)
+- ❌ Wrong: `test-report.md` (root level)
+- ❌ Wrong: `design-doc.md` (root level)
+
 ### Code Documentation
 
 - **README.md**: Project overview, setup, usage
@@ -277,6 +321,7 @@ When working on a task:
 
 ## Version History
 
+- **2025-11-14**: Added documentation file organization rules - All .md files (except README.md and CLAUDE.md) must be placed in docs/ directory
 - **2025-11-14**: Initial CLAUDE.md creation - Repository bootstrap phase
 
 ---
