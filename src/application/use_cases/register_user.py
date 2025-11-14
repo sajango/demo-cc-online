@@ -8,21 +8,11 @@ class RegisterUserUseCase:
     """Use case for registering a new user"""
 
     @inject
-    def __init__(
-        self,
-        user_repository: UserRepository,
-        password_service: PasswordService
-    ):
+    def __init__(self, user_repository: UserRepository, password_service: PasswordService):
         self.user_repository = user_repository
         self.password_service = password_service
 
-    async def execute(
-        self,
-        email: str,
-        username: str,
-        full_name: str,
-        password: str
-    ) -> User:
+    async def execute(self, email: str, username: str, full_name: str, password: str) -> User:
         """
         Register a new user with local authentication
 
@@ -54,7 +44,7 @@ class RegisterUserUseCase:
             password_hash=password_hash,
             auth_provider="local",
             is_active=True,
-            is_verified=False
+            is_verified=False,
         )
 
         # Save to repository

@@ -14,9 +14,7 @@ class JWTService:
         self.refresh_token_expire_days = settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
 
     def create_access_token(
-        self,
-        data: Dict[str, Any],
-        expires_delta: Optional[timedelta] = None
+        self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
         """
         Create a JWT access token
@@ -35,18 +33,13 @@ class JWTService:
         else:
             expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
 
-        to_encode.update({
-            "exp": expire,
-            "type": "access"
-        })
+        to_encode.update({"exp": expire, "type": "access"})
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt
 
     def create_refresh_token(
-        self,
-        data: Dict[str, Any],
-        expires_delta: Optional[timedelta] = None
+        self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
         """
         Create a JWT refresh token
@@ -65,10 +58,7 @@ class JWTService:
         else:
             expire = datetime.utcnow() + timedelta(days=self.refresh_token_expire_days)
 
-        to_encode.update({
-            "exp": expire,
-            "type": "refresh"
-        })
+        to_encode.update({"exp": expire, "type": "refresh"})
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return encoded_jwt

@@ -48,7 +48,7 @@ class AppleOAuthService:
                 key,
                 algorithms=["RS256"],
                 audience=self.client_id,
-                issuer=self.APPLE_ISSUER
+                issuer=self.APPLE_ISSUER,
             )
 
             # Validate issuer
@@ -68,7 +68,7 @@ class AppleOAuthService:
                 "full_name": "",  # Apple doesn't always provide name in token
                 "provider_user_id": provider_user_id,
                 "email_verified": payload.get("email_verified", "false") == "true",
-                "is_private_email": payload.get("is_private_email", "false") == "true"
+                "is_private_email": payload.get("is_private_email", "false") == "true",
             }
 
         except JWTError:
@@ -77,9 +77,7 @@ class AppleOAuthService:
             return None
 
     def extract_user_info_from_response(
-        self,
-        id_token_payload: Dict[str, Any],
-        user_data: Optional[Dict[str, Any]] = None
+        self, id_token_payload: Dict[str, Any], user_data: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Extract user info from Apple Sign-In response
@@ -107,5 +105,5 @@ class AppleOAuthService:
             "full_name": full_name or email.split("@")[0],  # Use email prefix if no name
             "provider_user_id": provider_user_id,
             "email_verified": id_token_payload.get("email_verified", "false") == "true",
-            "is_private_email": id_token_payload.get("is_private_email", "false") == "true"
+            "is_private_email": id_token_payload.get("is_private_email", "false") == "true",
         }

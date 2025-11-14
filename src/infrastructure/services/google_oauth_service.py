@@ -48,14 +48,11 @@ class GoogleOAuthService:
                 key,
                 algorithms=["RS256"],
                 audience=self.client_id,
-                options={"verify_at_hash": False}
+                options={"verify_at_hash": False},
             )
 
             # Validate issuer
-            if payload.get("iss") not in [
-                "https://accounts.google.com",
-                "accounts.google.com"
-            ]:
+            if payload.get("iss") not in ["https://accounts.google.com", "accounts.google.com"]:
                 return None
 
             # Extract user information
@@ -64,7 +61,7 @@ class GoogleOAuthService:
                 "full_name": payload.get("name", ""),
                 "provider_user_id": payload.get("sub"),
                 "email_verified": payload.get("email_verified", False),
-                "picture": payload.get("picture")
+                "picture": payload.get("picture"),
             }
 
         except JWTError:
@@ -72,10 +69,7 @@ class GoogleOAuthService:
         except Exception:
             return None
 
-    async def get_user_info_from_access_token(
-        self,
-        access_token: str
-    ) -> Optional[Dict[str, Any]]:
+    async def get_user_info_from_access_token(self, access_token: str) -> Optional[Dict[str, Any]]:
         """
         Get user info from Google using access token
 
@@ -88,8 +82,7 @@ class GoogleOAuthService:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    self.GOOGLE_USERINFO_URL,
-                    headers={"Authorization": f"Bearer {access_token}"}
+                    self.GOOGLE_USERINFO_URL, headers={"Authorization": f"Bearer {access_token}"}
                 )
 
                 if response.status_code != 200:
@@ -102,7 +95,7 @@ class GoogleOAuthService:
                     "full_name": user_info.get("name", ""),
                     "provider_user_id": user_info.get("sub"),
                     "email_verified": user_info.get("email_verified", False),
-                    "picture": user_info.get("picture")
+                    "picture": user_info.get("picture"),
                 }
 
         except Exception:

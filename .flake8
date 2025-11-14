@@ -24,12 +24,12 @@ exclude =
     migrations
 
 # Ignore specific error codes
-ignore =
-    E203,  # Whitespace before ':' (conflicts with Black)
-    E266,  # Too many leading '#' for block comment
-    E501,  # Line too long (handled by Black)
-    W503,  # Line break before binary operator (conflicts with Black)
-    W504,  # Line break after binary operator
+# E203: Whitespace before ':' (conflicts with Black)
+# E266: Too many leading '#' for block comment
+# E501: Line too long (handled by Black)
+# W503: Line break before binary operator (conflicts with Black)
+# W504: Line break after binary operator
+ignore = E203,E266,E501,W503,W504
 
 # Show source code for errors
 show-source = True

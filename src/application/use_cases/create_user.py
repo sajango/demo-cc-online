@@ -10,12 +10,7 @@ class CreateUserUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-    async def execute(
-        self,
-        email: str,
-        username: str,
-        full_name: str
-    ) -> User:
+    async def execute(self, email: str, username: str, full_name: str) -> User:
         """
         Create a new user
 
@@ -36,12 +31,7 @@ class CreateUserUseCase:
             raise ValueError(f"User with email {email} already exists")
 
         # Create new user entity
-        user = User(
-            email=email,
-            username=username,
-            full_name=full_name,
-            is_active=True
-        )
+        user = User(email=email, username=username, full_name=full_name, is_active=True)
 
         # Save to repository
         return await self.user_repository.create(user)

@@ -7,6 +7,7 @@ from src.infrastructure.database.base import Base, TimestampMixin
 
 class AuthProvider(enum.Enum):
     """Authentication provider enum"""
+
     LOCAL = "local"
     GOOGLE = "google"
     APPLE = "apple"

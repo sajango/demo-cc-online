@@ -28,11 +28,7 @@ async def lifespan(app: FastAPI):
 
 
 # Create FastAPI application
-app = FastAPI(
-    title=settings.APP_NAME,
-    debug=settings.DEBUG,
-    lifespan=lifespan
-)
+app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG, lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
@@ -51,11 +47,7 @@ app.include_router(users.router, prefix=settings.API_V1_PREFIX)
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {
-        "message": "Welcome to FastAPI Clean Architecture",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+    return {"message": "Welcome to FastAPI Clean Architecture", "version": "1.0.0", "docs": "/docs"}
 
 
 @app.get("/health")

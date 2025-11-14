@@ -9,20 +9,12 @@ class OAuthLoginUseCase:
     """Use case for OAuth login (Google, Apple)"""
 
     @inject
-    def __init__(
-        self,
-        user_repository: UserRepository,
-        jwt_service: JWTService
-    ):
+    def __init__(self, user_repository: UserRepository, jwt_service: JWTService):
         self.user_repository = user_repository
         self.jwt_service = jwt_service
 
     async def execute(
-        self,
-        email: str,
-        full_name: str,
-        provider: str,
-        provider_user_id: str
+        self, email: str, full_name: str, provider: str, provider_user_id: str
     ) -> Dict[str, str]:
         """
         Authenticate or register user via OAuth provider
@@ -82,17 +74,13 @@ class OAuthLoginUseCase:
                 auth_provider=provider,
                 oauth_provider_id=provider_user_id,
                 is_active=True,
-                is_verified=True  # OAuth users are pre-verified
+                is_verified=True,  # OAuth users are pre-verified
             )
 
             user = await self.user_repository.create(user)
 
         # Generate tokens
-        token_data = {
-            "sub": user.id,
-            "email": user.email,
-            "username": user.username
-        }
+        token_data = {"sub": user.id, "email": user.email, "username": user.username}
 
         access_token = self.jwt_service.create_access_token(token_data)
         refresh_token = self.jwt_service.create_refresh_token({"sub": user.id})
@@ -100,5 +88,5 @@ class OAuthLoginUseCase:
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
         }
