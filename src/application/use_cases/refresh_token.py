@@ -8,11 +8,7 @@ class RefreshTokenUseCase:
     """Use case for refreshing access token"""
 
     @inject
-    def __init__(
-        self,
-        user_repository: UserRepository,
-        jwt_service: JWTService
-    ):
+    def __init__(self, user_repository: UserRepository, jwt_service: JWTService):
         self.user_repository = user_repository
         self.jwt_service = jwt_service
 
@@ -48,11 +44,7 @@ class RefreshTokenUseCase:
             raise ValueError("Account is deactivated")
 
         # Generate new tokens
-        token_data = {
-            "sub": user.id,
-            "email": user.email,
-            "username": user.username
-        }
+        token_data = {"sub": user.id, "email": user.email, "username": user.username}
 
         access_token = self.jwt_service.create_access_token(token_data)
         new_refresh_token = self.jwt_service.create_refresh_token({"sub": user.id})
@@ -60,5 +52,5 @@ class RefreshTokenUseCase:
         return {
             "access_token": access_token,
             "refresh_token": new_refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
         }

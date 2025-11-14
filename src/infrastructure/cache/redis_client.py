@@ -9,11 +9,7 @@ def get_redis_client() -> Redis:
     """Get or create Redis client"""
     global redis_client
     if redis_client is None:
-        redis_client = from_url(
-            settings.REDIS_URL,
-            encoding="utf-8",
-            decode_responses=True
-        )
+        redis_client = from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
     return redis_client
 
 

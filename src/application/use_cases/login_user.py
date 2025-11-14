@@ -13,17 +13,13 @@ class LoginUserUseCase:
         self,
         user_repository: UserRepository,
         password_service: PasswordService,
-        jwt_service: JWTService
+        jwt_service: JWTService,
     ):
         self.user_repository = user_repository
         self.password_service = password_service
         self.jwt_service = jwt_service
 
-    async def execute(
-        self,
-        email: str,
-        password: str
-    ) -> Dict[str, str]:
+    async def execute(self, email: str, password: str) -> Dict[str, str]:
         """
         Authenticate a user and generate tokens
 
@@ -57,11 +53,7 @@ class LoginUserUseCase:
             raise ValueError("Account is deactivated")
 
         # Generate tokens
-        token_data = {
-            "sub": user.id,
-            "email": user.email,
-            "username": user.username
-        }
+        token_data = {"sub": user.id, "email": user.email, "username": user.username}
 
         access_token = self.jwt_service.create_access_token(token_data)
         refresh_token = self.jwt_service.create_refresh_token({"sub": user.id})
@@ -69,5 +61,5 @@ class LoginUserUseCase:
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
         }

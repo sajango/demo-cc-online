@@ -45,9 +45,11 @@ class UseCaseModule(Module):
 
 def create_container() -> Injector:
     """Create and configure the dependency injection container"""
-    return Injector([
-        DatabaseModule(),
-        CacheModule(),
-        RepositoryModule(),
-        UseCaseModule(),
-    ])
+    return Injector(
+        [
+            DatabaseModule(),
+            CacheModule(),
+            RepositoryModule(),
+            UseCaseModule(),
+        ]
+    )
