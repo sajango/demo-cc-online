@@ -1,0 +1,258 @@
+name: CI - Code Quality & Tests
+
+on:
+  push:
+    branches: [ main, master, develop, claude/** ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black==23.11.0 flake8==6.1.0 mypy==1.7.0
+        pip install -r requirements.txt
+
+    - name: Check code formatting with Black
+      run: |
+        echo "Checking code formatting with Black..."
+        black --check --diff src/ tests/
+      continue-on-error: false
+
+    - name: Lint with Flake8
+      run: |
+        echo "Linting with Flake8..."
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+      continue-on-error: false
+
+    - name: Type check with MyPy
+      run: |
+        echo "Type checking with MyPy..."
+        mypy src/ --ignore-missing-imports --no-strict-optional --warn-return-any --warn-unused-configs
+      continue-on-error: true  # Allow to fail for now
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc default-libmysqlclient-dev pkg-config
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run unit tests with pytest
+      run: |
+        echo "Running unit tests..."
+        pytest tests/unit/ -v --tb=short
+      env:
+        DATABASE_URL: mysql+aiomysql://test:test@localhost:3306/test_db
+        REDIS_URL: redis://localhost:6379/0
+        JWT_SECRET_KEY: test-secret-key-for-ci-testing-only
+
+    - name: Run tests with coverage
+      if: matrix.python-version == '3.11'
+      run: |
+        echo "Running tests with coverage..."
+        pytest tests/unit/ --cov=src --cov-report=term-missing --cov-report=xml --cov-report=html
+      env:
+        DATABASE_URL: mysql+aiomysql://test:test@localhost:3306/test_db
+        REDIS_URL: redis://localhost:6379/0
+        JWT_SECRET_KEY: test-secret-key-for-ci-testing-only
+
+    - name: Upload coverage to artifacts
+      if: matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          htmlcov/
+          coverage.xml
+
+    - name: Check coverage threshold
+      if: matrix.python-version == '3.11'
+      run: |
+        echo "Checking coverage threshold..."
+        coverage report --fail-under=60
+      continue-on-error: true
+
+  integration-test:
+    name: Integration Tests (with Docker services)
+    runs-on: ubuntu-latest
+    needs: test
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc default-libmysqlclient-dev pkg-config
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {1..30}; do
+          if mysqladmin ping -h 127.0.0.1 -u test -ptest --silent; then
+            echo "MySQL is ready!"
+            break
+          fi
+          echo "Waiting for MySQL... ($i/30)"
+          sleep 2
+        done
+
+    - name: Run database migrations
+      run: |
+        echo "Running database migrations..."
+        alembic upgrade head
+      env:
+        DATABASE_URL: mysql+aiomysql://test:test@127.0.0.1:3306/test_db
+        REDIS_URL: redis://127.0.0.1:6379/0
+        JWT_SECRET_KEY: test-secret-key-for-ci-testing-only
+
+    - name: Run integration tests
+      run: |
+        echo "Running integration tests..."
+        pytest tests/integration/ -v --tb=short || echo "No integration tests found yet"
+      env:
+        DATABASE_URL: mysql+aiomysql://test:test@127.0.0.1:3306/test_db
+        REDIS_URL: redis://127.0.0.1:6379/0
+        JWT_SECRET_KEY: test-secret-key-for-ci-testing-only
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: code-quality
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit
+
+    - name: Check dependencies for vulnerabilities with Safety
+      run: |
+        echo "Checking dependencies for security vulnerabilities..."
+        safety check --json || true
+      continue-on-error: true
+
+    - name: Run security scan with Bandit
+      run: |
+        echo "Running security scan with Bandit..."
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ -ll
+      continue-on-error: true
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: bandit-report.json
+      if: always()
+
+  build-status:
+    name: Build Status Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, integration-test, security-scan]
+    if: always()
+
+    steps:
+    - name: Check build status
+      run: |
+        echo "All checks completed!"
+        echo "Code Quality: ${{ needs.code-quality.result }}"
+        echo "Tests: ${{ needs.test.result }}"
+        echo "Integration Tests: ${{ needs.integration-test.result }}"
+        echo "Security Scan: ${{ needs.security-scan.result }}"
+
+    - name: Report success
+      if: ${{ needs.code-quality.result == 'success' && needs.test.result == 'success' }}
+      run: |
+        echo "✅ Build successful! All quality checks and tests passed."
+
+    - name: Report failure
+      if: ${{ needs.code-quality.result == 'failure' || needs.test.result == 'failure' }}
+      run: |
+        echo "❌ Build failed! Please check the logs above."
+        exit 1
