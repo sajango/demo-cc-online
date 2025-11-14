@@ -22,19 +22,28 @@ class UserRepositoryImpl(UserRepository):
             email=model.email,
             username=model.username,
             full_name=model.full_name,
+            password_hash=model.password_hash,
+            auth_provider=model.auth_provider.value if model.auth_provider else "local",
+            oauth_provider_id=model.oauth_provider_id,
             is_active=model.is_active,
+            is_verified=model.is_verified,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
 
     def _to_model(self, entity: User) -> UserModel:
         """Convert domain entity to SQLAlchemy model"""
+        from src.infrastructure.database.models import AuthProvider
         return UserModel(
             id=entity.id,
             email=entity.email,
             username=entity.username,
             full_name=entity.full_name,
+            password_hash=entity.password_hash,
+            auth_provider=AuthProvider(entity.auth_provider) if entity.auth_provider else AuthProvider.LOCAL,
+            oauth_provider_id=entity.oauth_provider_id,
             is_active=entity.is_active,
+            is_verified=entity.is_verified,
         )
 
     async def create(self, user: User) -> User:
@@ -81,7 +90,9 @@ class UserRepositoryImpl(UserRepository):
         model.email = user.email
         model.username = user.username
         model.full_name = user.full_name
+        model.password_hash = user.password_hash
         model.is_active = user.is_active
+        model.is_verified = user.is_verified
 
         await self.session.flush()
         await self.session.refresh(model)
