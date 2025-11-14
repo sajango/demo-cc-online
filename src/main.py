@@ -6,7 +6,7 @@ from src.core.config import settings
 from src.infrastructure.database.base import Base
 from src.infrastructure.database.session import get_async_engine
 from src.infrastructure.cache.redis_client import close_redis
-from src.presentation.api.v1 import users
+from src.presentation.api.v1 import users, auth
 
 
 @asynccontextmanager
@@ -44,6 +44,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(users.router, prefix=settings.API_V1_PREFIX)
 
 

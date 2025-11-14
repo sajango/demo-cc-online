@@ -24,9 +24,11 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(UserBase):
-    """Schema for user response"""
-    id: int
+    """Schema for user response (excludes sensitive fields)"""
+    id: str
     is_active: bool
+    is_verified: bool
+    auth_provider: str
     created_at: datetime
     updated_at: datetime
 

@@ -12,7 +12,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, user_id: int) -> Optional[User]:
+    async def get_by_id(self, user_id: str) -> Optional[User]:
         """Get user by ID"""
         pass
 
@@ -32,6 +32,6 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, user_id: int) -> bool:
+    async def delete(self, user_id: str) -> bool:
         """Delete user"""
         pass
