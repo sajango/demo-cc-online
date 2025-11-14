@@ -36,10 +36,10 @@ async def create_user(
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
-    user_id: int,
+    user_id: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """Get user by ID"""
+    """Get user by ID (UUID)"""
     repository = UserRepositoryImpl(db)
     use_case = GetUserUseCase(repository)
 

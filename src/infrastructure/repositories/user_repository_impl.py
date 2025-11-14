@@ -45,7 +45,7 @@ class UserRepositoryImpl(UserRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def get_by_id(self, user_id: int) -> Optional[User]:
+    async def get_by_id(self, user_id: str) -> Optional[User]:
         """Get user by ID"""
         result = await self.session.execute(
             select(UserModel).where(UserModel.id == user_id)
@@ -87,7 +87,7 @@ class UserRepositoryImpl(UserRepository):
         await self.session.refresh(model)
         return self._to_entity(model)
 
-    async def delete(self, user_id: int) -> bool:
+    async def delete(self, user_id: str) -> bool:
         """Delete user"""
         result = await self.session.execute(
             select(UserModel).where(UserModel.id == user_id)

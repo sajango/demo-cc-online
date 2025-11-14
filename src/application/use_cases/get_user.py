@@ -11,12 +11,12 @@ class GetUserUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-    async def get_by_id(self, user_id: int) -> Optional[User]:
+    async def get_by_id(self, user_id: str) -> Optional[User]:
         """
         Get user by ID
 
         Args:
-            user_id: User ID
+            user_id: User ID (UUID)
 
         Returns:
             User entity if found, None otherwise

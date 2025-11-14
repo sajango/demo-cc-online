@@ -25,7 +25,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     """Schema for user response"""
-    id: int
+    id: str
     is_active: bool
     created_at: datetime
     updated_at: datetime

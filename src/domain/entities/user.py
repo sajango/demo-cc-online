@@ -7,7 +7,7 @@ from typing import Optional
 class User:
     """User domain entity"""
 
-    id: Optional[int] = None
+    id: Optional[str] = None
     email: str = ""
     username: str = ""
     full_name: str = ""
