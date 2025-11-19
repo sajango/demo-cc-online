@@ -9,7 +9,8 @@
       "mcp__serena__write_memory",
       "WebSearch",
       "mcp__serena__get_symbols_overview",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
     ],
     "deny": [],
     "ask": []

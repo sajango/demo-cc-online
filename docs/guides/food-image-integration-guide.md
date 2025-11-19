@@ -109,7 +109,13 @@ curl -X POST "http://localhost:8000/api/v1/food-images/upload" \
     "width": 1920,
     "height": 1080
   },
-  "analysis": "Phân tích món ăn từ Z-AI..."
+  "analysis": {
+    "dish_name": "Phở Bò",
+    "ingredients": ["beef", "rice noodles", "herbs", "broth"],
+    "estimated_calories": "350-450 kcal",
+    "description": "Phở bò là món ăn truyền thống Việt Nam với nước dùng trong, thịt bò mềm và rau thơm",
+    "confidence": "high"
+  }
 }
 ```
 
@@ -137,7 +143,11 @@ response = requests.post(url, files=files, data=data)
 result = response.json()
 
 if result["success"]:
-    print(f"Phân tích: {result['analysis']}")
+    analysis = result['analysis']
+    print(f"Món ăn: {analysis['dish_name']}")
+    print(f"Nguyên liệu: {', '.join(analysis['ingredients'])}")
+    print(f"Calo: {analysis['estimated_calories']}")
+    print(f"Mô tả: {analysis['description']}")
     print(f"Kích thước: {result['image_info']['width']}x{result['image_info']['height']}")
 else:
     print(f"Lỗi: {result['message']}")
@@ -160,7 +170,11 @@ async function uploadFoodImage(file) {
     const result = await response.json();
 
     if (result.success) {
-      console.log('Phân tích:', result.analysis);
+      const analysis = result.analysis;
+      console.log('Món ăn:', analysis.dish_name);
+      console.log('Nguyên liệu:', analysis.ingredients.join(', '));
+      console.log('Calo:', analysis.estimated_calories);
+      console.log('Mô tả:', analysis.description);
       console.log('Thông tin ảnh:', result.image_info);
     } else {
       console.error('Lỗi:', result.message);
@@ -304,15 +318,21 @@ except Exception as e:
 ```python
 # Kiểm tra success trước khi xử lý
 if result.get("success"):
-    analysis = result.get("analysis", "")
+    analysis = result.get("analysis", {})
     image_info = result.get("image_info", {})
+
+    # Trích xuất thông tin từ structured analysis
+    dish_name = analysis.get("dish_name", "Unknown")
+    ingredients = analysis.get("ingredients", [])
+    calories = analysis.get("estimated_calories", "N/A")
+    description = analysis.get("description", "")
 
     # Lưu token usage để tracking
     usage = result.get("zai_metadata", {}).get("usage", {})
     total_tokens = usage.get("total_tokens", 0)
 
     # Xử lý analysis
-    display_food_analysis(analysis, image_info)
+    display_food_analysis(dish_name, ingredients, calories, description, image_info)
 ```
 
 ### 3. Performance Optimization

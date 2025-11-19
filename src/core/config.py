@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     APPLE_REDIRECT_URI: Optional[str] = None
 
     # Z-AI Configuration
-    ZAI_API_KEY: str
+    ZAI_API_KEY: Optional[str] = None
     ZAI_BASE_URL: str = "https://api.z.ai/api/paas/v4/"
 
     class Config:

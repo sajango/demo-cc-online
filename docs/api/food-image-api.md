@@ -76,7 +76,13 @@ console.log(result);
     "original_size_bytes": 524288,
     "converted_size_bytes": 512000
   },
-  "analysis": "This is a plate of Pad Thai, a popular Thai stir-fried noodle dish. The dish contains rice noodles, shrimp, tofu, bean sprouts, peanuts, and lime. Estimated calories: 450-550 kcal per serving. The vibrant colors and fresh ingredients suggest a well-prepared, authentic Pad Thai.",
+  "analysis": {
+    "dish_name": "Pad Thai",
+    "ingredients": ["rice noodles", "shrimp", "tofu", "bean sprouts", "peanuts", "lime"],
+    "estimated_calories": "450-550 kcal",
+    "description": "Pad Thai là một món mì xào nổi tiếng của Thái Lan với hương vị chua ngọt đặc trưng",
+    "confidence": "high"
+  },
   "zai_metadata": {
     "model": "glm-4v",
     "usage": {

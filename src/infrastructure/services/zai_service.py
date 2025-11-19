@@ -1,5 +1,6 @@
 """Z-AI service for image upload and processing."""
 import base64
+import json
 from typing import Optional
 
 from zai import ZaiClient
@@ -49,27 +50,51 @@ class ZaiService:
 
             # Call Z-AI API with multimodal chat
             response = self.client.chat.completions.create(
-                model="glm-4v",  # Vision model for image analysis
+                model="glm-4.5v",  # Vision model for image analysis
                 messages=[
                     {
                         "role": "user",
                         "content": [
                             {
                                 "type": "text",
-                                "text": "Analyze this food image. Identify the dish name, ingredients, estimated calories, and provide a brief description.",
+                                "text": """Analyze this food image and provide a structured JSON response with the following format:
+{
+    "dish_name": "Name of the dish in Vietnamese",
+    "ingredients": ["ingredient1", "ingredient2", ...],
+    "estimated_calories": "calorie range (e.g., 450-550 kcal)",
+    "description": "Brief description of the dish in Vietnamese",
+    "confidence": "high/medium/low"
+}
+
+Only return the JSON object, no additional text.""",
                             },
                             {"type": "image_url", "image_url": {"url": image_data_url}},
                         ],
                     }
                 ],
+                temperature=0.5,
+                max_tokens=2000,
             )
 
             # Extract analysis result
-            analysis = response.choices[0].message.content if response.choices else "No analysis available"
+            analysis_text = response.choices[0].message.content if response.choices else "{}"
+
+            # Parse JSON response
+            try:
+                analysis_data = json.loads(analysis_text)
+            except json.JSONDecodeError:
+                # Fallback if response is not valid JSON
+                analysis_data = {
+                    "dish_name": "Unknown",
+                    "ingredients": [],
+                    "estimated_calories": "N/A",
+                    "description": analysis_text,
+                    "confidence": "low"
+                }
 
             return {
                 "success": True,
-                "analysis": analysis,
+                "analysis": analysis_data,
                 "model": response.model,
                 "usage": {
                     "prompt_tokens": response.usage.prompt_tokens if response.usage else 0,

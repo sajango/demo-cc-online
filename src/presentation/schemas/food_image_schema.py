@@ -1,5 +1,5 @@
 """Pydantic schemas for food image upload API."""
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -31,13 +31,23 @@ class ZaiMetadata(BaseModel):
     usage: ZaiUsageInfo = Field(..., description="Token usage information")
 
 
+class FoodAnalysisData(BaseModel):
+    """Structured food analysis data from Z-AI."""
+
+    dish_name: str = Field(..., description="Name of the dish in Vietnamese")
+    ingredients: List[str] = Field(..., description="List of ingredients")
+    estimated_calories: str = Field(..., description="Estimated calorie range")
+    description: str = Field(..., description="Brief description of the dish")
+    confidence: str = Field(..., description="Confidence level: high/medium/low")
+
+
 class FoodImageUploadResponse(BaseModel):
     """Response for food image upload and analysis."""
 
     success: bool = Field(..., description="Whether the operation was successful")
     message: str = Field(..., description="Success or error message")
     image_info: ImageInfoResponse = Field(..., description="Information about the processed image")
-    analysis: str = Field(..., description="Z-AI analysis of the food image")
+    analysis: FoodAnalysisData = Field(..., description="Structured food analysis data")
     zai_metadata: ZaiMetadata = Field(..., description="Z-AI request metadata")
 
     model_config = {"json_schema_extra": {"example": {
@@ -52,7 +62,13 @@ class FoodImageUploadResponse(BaseModel):
             "original_size_bytes": 524288,
             "converted_size_bytes": 512000,
         },
-        "analysis": "This is a plate of Pad Thai, a popular Thai stir-fried noodle dish...",
+        "analysis": {
+            "dish_name": "Pad Thai",
+            "ingredients": ["rice noodles", "shrimp", "tofu", "bean sprouts", "peanuts", "lime"],
+            "estimated_calories": "450-550 kcal",
+            "description": "Pad Thai là một món mì xào nổi tiếng của Thái Lan với hương vị chua ngọt đặc trưng",
+            "confidence": "high"
+        },
         "zai_metadata": {"model": "glm-4v", "usage": {"prompt_tokens": 150, "completion_tokens": 200, "total_tokens": 350}},
     }}}
 

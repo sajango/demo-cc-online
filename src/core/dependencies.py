@@ -35,4 +35,9 @@ def get_zai_service() -> ZaiService:
     """
     Dependency for getting Z-AI service
     """
+    if not settings.ZAI_API_KEY:
+        raise ValueError(
+            "ZAI_API_KEY is not configured. Please set ZAI_API_KEY in your .env file. "
+            "See .env.example for reference."
+        )
     return ZaiService(api_key=settings.ZAI_API_KEY, base_url=settings.ZAI_BASE_URL)
