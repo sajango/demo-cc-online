@@ -13,6 +13,7 @@ A production-ready FastAPI project template implementing Clean Architecture prin
 - **Database Migrations**: Alembic for schema management
 - **Type Safety**: Full type hints throughout the codebase
 - **Testing Ready**: Structured test directory with pytest
+- **Food Analysis API**: AI-powered food image analysis using Z-AI SDK to identify dishes, ingredients, and calorie estimation
 
 ## Project Structure
 
@@ -127,7 +128,15 @@ DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/app_db
 REDIS_URL=redis://localhost:6379/0
 ENVIRONMENT=development
 DEBUG=True
+
+# Z-AI Integration (for Food Analysis API)
+ZAI_API_KEY=your-zai-api-key-here
 ```
+
+**Getting Z-AI API Key:**
+1. Visit [Z.ai Open Platform](https://z.ai) for international users or [Zhipu AI](https://open.bigmodel.cn) for Chinese users
+2. Register an account and create an API key
+3. Copy the API key to your `.env` file
 
 ### Database Migrations
 
@@ -176,6 +185,53 @@ curl -X POST "http://localhost:8000/api/v1/users/" \
     "full_name": "John Doe"
   }'
 ```
+
+## Food Analysis API
+
+The Food Analysis API uses Z-AI SDK to analyze food images and provide:
+- Dish name identification
+- Ingredients list
+- Estimated calorie content
+
+### Endpoint
+
+```
+POST /api/v1/food-analysis/analyze
+```
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/food-analysis/analyze" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/food-image.jpg"
+```
+
+### Example Response
+
+```json
+{
+  "dish_name": "Phở Bò",
+  "ingredients": [
+    "Bánh phở",
+    "Thịt bò",
+    "Hành lá",
+    "Ngò gai",
+    "Giá đỗ"
+  ],
+  "estimated_calories": "350-450 kcal",
+  "analysis_details": "Đây là món phở bò truyền thống Việt Nam..."
+}
+```
+
+### Requirements
+
+- Image formats: JPEG, PNG, WEBP
+- Max file size: 10MB
+- Z-AI API key must be configured in `.env`
+
+For detailed documentation, see [docs/api/food-analysis-api.md](docs/api/food-analysis-api.md)
 
 ## Testing
 

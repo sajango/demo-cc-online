@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     APPLE_PRIVATE_KEY: Optional[str] = None
     APPLE_REDIRECT_URI: Optional[str] = None
 
+    # Z-AI Integration
+    ZAI_API_KEY: Optional[str] = None
+
     class Config:
         env_file = ".env"
         case_sensitive = True
